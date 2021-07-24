@@ -26,7 +26,14 @@
 
 # JPEG
 set(JPEG_SUPPORT FALSE)
-find_package(JPEG)
+
+if(HUNTER_ENABLED)
+    hunter_add_package(Jpeg)
+    find_package(Jpeg CONFIG REQUIRED)
+else()
+    find_package(JPEG)
+endif()
+
 option(jpeg "use libjpeg (required for JPEG compression)" ${JPEG_FOUND})
 if (jpeg AND JPEG_FOUND)
     set(JPEG_SUPPORT TRUE)

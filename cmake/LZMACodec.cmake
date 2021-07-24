@@ -26,7 +26,13 @@
 
 # liblzma2
 set(LZMA_SUPPORT FALSE)
-find_package(liblzma)
+
+if(HUNTER_ENABLED)
+    hunter_add_package(liblzma)
+    find_package(liblzma CONFIG REQUIRED)
+else()
+    find_package(liblzma)
+endif()
 
 option(lzma "use liblzma (required for LZMA2 compression)" ${LIBLZMA_FOUND})
 if (lzma AND LIBLZMA_FOUND)

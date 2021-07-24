@@ -28,7 +28,12 @@
 set(ZSTD_SUPPORT FALSE)
 set(ZSTD_USABLE FALSE)
 
-find_package(ZSTD)
+if(HUNTER_ENABLED)
+    hunter_add_package(zstd)
+    find_package(zstd CONFIG REQUIRED)
+else()
+    find_package(ZSTD)
+endif()
 
 if(ZSTD_FOUND)
     if(TARGET zstd::libzstd_shared)

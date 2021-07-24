@@ -26,7 +26,14 @@
 
 # ZLIB
 set(ZLIB_SUPPORT FALSE)
-find_package(ZLIB)
+
+if(HUNTER_ENABLED)
+    hunter_add_package(ZLIB)
+    find_package(ZLIB CONFIG REQUIRED)
+else()
+    find_package(ZLIB)
+endif()
+
 option(zlib "use zlib (required for Deflate compression)" ${ZLIB_FOUND})
 if(zlib AND ZLIB_FOUND)
     set(ZLIB_SUPPORT TRUE)

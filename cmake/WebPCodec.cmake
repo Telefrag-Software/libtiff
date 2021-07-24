@@ -26,7 +26,12 @@
 # libwebp
 set(WEBP_SUPPORT FALSE)
 
-find_package(WebP)
+if(HUNTER_ENABLED)
+    hunter_add_package(WebP)
+    find_package(WebP CONFIG REQUIRED)
+else()
+    find_package(WebP)
+endif()
 
 option(webp "use libwebp (required for WEBP compression)" ${WebP_FOUND})
 
