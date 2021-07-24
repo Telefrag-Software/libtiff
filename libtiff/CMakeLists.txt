@@ -120,6 +120,13 @@ target_include_directories(tiff
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
         ${TIFF_INCLUDES}
 )
+target_compile_definitions(tiff
+  PUBLIC
+    TIFF_SIZE_T=${TIFF_SIZE_T}
+    TIFF_SIZE_FORMAT="%${TIFF_SIZE_FORMAT}"
+    TIFF_SSIZE_T=${TIFF_SSIZE_T}
+    TIFF_SSIZE_FORMAT="%${TIFF_SSIZE_FORMAT}"
+)
 target_link_libraries(tiff ${TIFF_LIBRARY_DEPS})
 set_target_properties(tiff PROPERTIES SOVERSION ${SO_COMPATVERSION})
 if(NOT CYGWIN)
@@ -134,17 +141,66 @@ if(HAVE_LD_VERSION_SCRIPT)
                         "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiff.map")
 endif()
 
-install(TARGETS tiff
+if(HUNTER_ENABLED)
+  set(EXPORT_PROJECT_NAME "${PROJECT_NAME}")
+  set(TARGETS_EXPORT_NAME "${EXPORT_PROJECT_NAME}Targets")
+
+  install(TARGETS ${EXPORT_PROJECT_NAME}
+          EXPORT ${TARGETS_EXPORT_NAME}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+  install(FILES ${${EXPORT_PROJECT_NAME}_HEADERS} ${nodist_${EXPORT_PROJECT_NAME}_HEADERS}
+          DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+  set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${EXPORT_PROJECT_NAME}")
+  set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+  set(version_config "${generated_dir}/${EXPORT_PROJECT_NAME}ConfigVersion.cmake")
+  set(project_config "${generated_dir}/${EXPORT_PROJECT_NAME}Config.cmake")
+
+  include(CMakePackageConfigHelpers)
+
+  write_basic_package_version_file(
+      "${version_config}" COMPATIBILITY SameMajorVersion
+  )
+
+  configure_package_config_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in"
+      "${project_config}"
+      INSTALL_DESTINATION "${config_install_dir}"
+  )
+
+  install(
+      FILES "${project_config}" "${version_config}"
+      DESTINATION "${config_install_dir}"
+  )
+
+  install(
+      EXPORT "${TARGETS_EXPORT_NAME}"
+      DESTINATION "${config_install_dir}"
+  )
+else()
+  install(TARGETS tiff
         RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
 
-install(FILES ${tiff_HEADERS} ${nodist_tiff_HEADERS}
+  install(FILES ${tiff_HEADERS} ${nodist_tiff_HEADERS}
         DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+endif()
 
 if(CXX_SUPPORT)
   add_library(tiffxx ${tiffxx_SOURCES} ${tiffxx_HEADERS})
   target_link_libraries(tiffxx tiff)
+  target_compile_definitions(tiffxx
+    PUBLIC
+      TIFF_SIZE_T=${TIFF_SIZE_T}
+      TIFF_SIZE_FORMAT="%${TIFF_SIZE_FORMAT}"
+      TIFF_SSIZE_T=${TIFF_SSIZE_T}
+      TIFF_SSIZE_FORMAT="%${TIFF_SSIZE_FORMAT}"
+  )
   set_target_properties(tiffxx PROPERTIES SOVERSION ${SO_COMPATVERSION})
   if(NOT CYGWIN)
     # This property causes shared libraries on Linux to have the full version
@@ -158,12 +214,54 @@ if(CXX_SUPPORT)
                           "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/libtiffxx.map")
   endif()
 
-  install(TARGETS tiffxx
-          RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
-          LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-          ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
+  if(HUNTER_ENABLED)
+    set(EXPORT_PROJECT_NAME "${PROJECT_NAME}xx")
+    set(TARGETS_EXPORT_NAME "${EXPORT_PROJECT_NAME}Targets")
 
-  install(FILES ${tiffxx_HEADERS}
-          DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+    install(TARGETS ${EXPORT_PROJECT_NAME}
+            EXPORT ${TARGETS_EXPORT_NAME}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+    install(FILES ${${EXPORT_PROJECT_NAME}_HEADERS}
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+    set(cxx_config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${EXPORT_PROJECT_NAME}")
+    set(cxx_generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+    set(cxx_version_config "${cxx_generated_dir}/${EXPORT_PROJECT_NAME}ConfigVersion.cmake")
+    set(cxx_project_config "${cxx_generated_dir}/${EXPORT_PROJECT_NAME}Config.cmake")
+
+    include(CMakePackageConfigHelpers)
+
+    write_basic_package_version_file(
+        "${cxx_version_config}" COMPATIBILITY SameMajorVersion
+    )
+
+    configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in"
+        "${cxx_project_config}"
+        INSTALL_DESTINATION "${cxx_config_install_dir}"
+    )
+
+    install(
+        FILES "${cxx_project_config}" "${cxx_version_config}"
+        DESTINATION "${cxx_config_install_dir}"
+    )
+
+    install(
+        EXPORT "${TARGETS_EXPORT_NAME}"
+        DESTINATION "${cxx_config_install_dir}"
+    )
+  else()
+    install(TARGETS tiffxx
+            RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
+
+    install(FILES ${tiffxx_HEADERS}
+            DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+  endif()
 
 endif()
