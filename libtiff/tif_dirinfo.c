@@ -937,8 +937,8 @@ const TIFFField *TIFFFieldWithTag(TIFF *tif, uint32_t tag)
     {
         if (tif->tif_warn_about_unknown_tags)
         {
-            TIFFWarningExtR(tif, "TIFFFieldWithTag", "Warning, unknown tag 0x%x",
-                            (unsigned int)tag);
+            TIFFWarningExtR(tif, "TIFFFieldWithTag",
+                            "Warning, unknown tag 0x%x", (unsigned int)tag);
         }
     }
     return (fip);
