@@ -27,6 +27,7 @@
 #include "tiff_tools.h"
 #include "tiffiop.h"
 
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h> /* for atof */
@@ -952,6 +953,8 @@ static int get_subimage_count(double pagewidth, double pageheight,
             *ximages = 1;
             *yimages = 1;
     }
+    if (*ximages <= 0 || *yimages <= 0 || *ximages > INT_MAX / *yimages)
+        return (0);
     pages = (*ximages) * (*yimages);
     return (pages);
 }
