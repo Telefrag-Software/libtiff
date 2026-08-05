@@ -217,6 +217,15 @@ int main(int argc, char *argv[])
         }
         ibuf = (unsigned char *)_TIFFmalloc(tss_in);
         obuf = (unsigned char *)_TIFFmalloc(tss_out);
+        if (ibuf == NULL || obuf == NULL)
+        {
+            fprintf(stderr, "No space for scanline buffers\n");
+            _TIFFfree(ibuf);
+            _TIFFfree(obuf);
+            TIFFClose(in);
+            TIFFClose(out);
+            return EXIT_FAILURE;
+        }
         switch (config)
         {
             case PLANARCONFIG_CONTIG:

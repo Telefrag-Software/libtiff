@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 float ycbcrCoeffs[3] = {.299, .587, .114};
 /* default coding range is CCIR Rec 601-1 with no headroom/footroom */
 unsigned long refBlackWhite[6] = {0, 255, 128, 255, 128, 255};
@@ -80,6 +82,11 @@ static float *setupLuma(float c)
 {
     float *v = (float *)_TIFFmalloc(256 * sizeof(float));
     int i;
+    if (v == NULL)
+    {
+        printf("No space for luma table.\n");
+        exit(1);
+    }
     for (i = 0; i < 256; i++)
         v[i] = c * i;
     return (v);
