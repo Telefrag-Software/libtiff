@@ -1,9 +1,9 @@
 include_guard()
 
-hunter_config(Jpeg
+hunter_config(jpeg
 	URL "https://codeload.github.com/Telefrag-Software/libjpeg/zip/tags/9f"
 	VERSION "9f"
-	SHA1 "2f0ca550a93e9dc429dbd94b70aace53b9360bc6"
+	SHA1 "983e8b6e4a508944522f48c2dd680331012a322f"
 )
 
 hunter_config(liblzma
