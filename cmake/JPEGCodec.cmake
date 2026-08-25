@@ -29,7 +29,7 @@ set(JPEG_SUPPORT FALSE)
 
 if(HUNTER_ENABLED)
     hunter_add_package(Jpeg)
-    find_package(Jpeg CONFIG REQUIRED)
+    find_package(jpeg CONFIG REQUIRED)
 else()
     # Option to prefer standard JPEG over TurboJPEG
     option(jpeg-prefer-standard "prefer standard JPEG library over libjpeg-turbo" OFF)
